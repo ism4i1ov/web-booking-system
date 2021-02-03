@@ -26,6 +26,14 @@ public class Flight implements Serializable {
         this.freePlaces = freePlaces;
     }
 
+    public LocalDateTime getDepartDateTime() {
+        return departDateTime;
+    }
+
+    public LocalDateTime getArrivalDateTime() {
+        return arrivalDateTime;
+    }
+
     public int getId() {
         return id;
     }
@@ -38,15 +46,15 @@ public class Flight implements Serializable {
         this.airlineName = airlineName;
     }
 
-    public LocalDateTime getArrivalDateTime() {
-        return arrivalDateTime;
+    public String getArrivalDateTimeString() {
+        return arrivalDateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
     }
 
     public void setArrivalDateTime(LocalDateTime arrivalDateTime) {
         this.arrivalDateTime = arrivalDateTime;
     }
 
-    public String getDepartDateTime() {
+    public String getDepartDateTimeString() {
         return departDateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
     }
 

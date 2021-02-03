@@ -47,6 +47,13 @@ public class FlightServlet extends HttpServlet {
         } catch (TemplateException e) {
             e.printStackTrace();
         }
+    }
 
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String[] bookingId = req.getParameterValues("remove_booking");
+        String id = bookingId[0];
+        bookingService.cancelBooking(id);
+        resp.sendRedirect("/user_panel");
     }
 }

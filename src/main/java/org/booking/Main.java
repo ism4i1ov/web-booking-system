@@ -1,10 +1,7 @@
 package org.booking;
 
 import org.booking.constant.TemplateEngine;
-import org.booking.controller.FlightServlet;
-import org.booking.controller.LoginServlet;
-import org.booking.controller.StaticServlet;
-import org.booking.controller.UserPanelServlet;
+import org.booking.controller.*;
 import org.booking.db.dao.BookingDao;
 import org.booking.db.dao.FlightDao;
 import org.booking.db.dao.UserDao;
@@ -32,6 +29,7 @@ public class Main {
         handler.addServlet(new ServletHolder(new StaticServlet("css")), "/css/*");
         handler.addServlet(new ServletHolder(new StaticServlet("js")), "/js/*");
         handler.addServlet(new ServletHolder(new StaticServlet("image")), "/image/*");
+        handler.addServlet(new ServletHolder(new BookingFlightServlet(templateEngine, bookingService)), "/book_flight");
 
         handler.addFilter(AuthFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
 

@@ -56,7 +56,7 @@ public class UserPanelServlet extends HttpServlet {
             }
             resp.sendRedirect("/login");
         } else {
-
+            resp.sendRedirect("/book_flight");
         }
     }
 }
