@@ -7,6 +7,8 @@ import org.booking.entity.Booking;
 import org.booking.entity.Flight;
 import org.booking.entity.User;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,15 +36,14 @@ public class BookingService {
     public Optional<Booking> bookFlight(int userId, int flightId, int ticketCount) {
         Booking booking = new Booking(0, flightId, ticketCount, userId);
         int addBookingId = bookingDao.create(booking);
-
-        Optional<Flight> optionalFlight = flightDao.getById(String.valueOf(flightId));
-        optionalFlight.get().setFreePlaces(optionalFlight.get().getFreePlaces() - ticketCount);
-        flightDao.update(optionalFlight.get());
-
+        flightDao.getById(String.valueOf(flightId)).ifPresent(flight -> {
+            flight.setFreePlaces(flight.getFreePlaces() - ticketCount);
+            flightDao.update(flight);
+        });
         return bookingDao.getById(String.valueOf(addBookingId));
     }
 
-    public List<Flight> getFlightByDestDateTicketCount(String destination, String date, String ticketCount) {
+    public List<Flight> getFlightByDestDateTicketCount(String destination, LocalDateTime date, String ticketCount) {
         return flightDao.getFlightByDestDateTicketCount(destination, date, ticketCount);
     }
 

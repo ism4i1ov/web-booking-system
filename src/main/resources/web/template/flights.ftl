@@ -5,8 +5,8 @@
     <link rel="stylesheet" href="../css/style.css" type="text/css">
 </head>
 <body>
-<table>
-    <form method="post">
+<form method="post">
+    <table>
         <tr>
             <th>Booking id</th>
             <th>Flight id</th>
@@ -23,7 +23,9 @@
                 </td>
             </tr>
         </#list>
-    </form>
-</table>
+    </table>
+    <input type="submit" name="main_page" value="Main page">
+    <input type="submit" name="logout" value="Logout">
+</form>
 </body>
 </html>

@@ -16,14 +16,16 @@ public class BookingDao implements DatabaseInter<Booking> {
     @Override
     public int create(Booking booking) {
         String sql = "insert into " +
-                "booking values(default,?,?,?) returning id";
+                "booking values(default,?,?,?);";
+        String sql2 = "SELECT LAST_INSERT_ID();";
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
             preparedStatement.setInt(1, booking.getFlightId());
             preparedStatement.setInt(2, booking.getTicketCount());
             preparedStatement.setInt(3, booking.getUserId());
-            ResultSet resultSet = preparedStatement.executeQuery();
+            preparedStatement.execute();
+            ResultSet resultSet = preparedStatement.executeQuery(sql2);
             resultSet.next();
-            return resultSet.getInt("id");
+            return resultSet.getInt("LAST_INSERT_ID()");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -32,9 +34,10 @@ public class BookingDao implements DatabaseInter<Booking> {
 
     @Override
     public boolean delete(String id) {
-        String sql = "delete from booking where id = " + id;
-        try (Statement statement = getConnection().createStatement()) {
-            return statement.execute(sql);
+        String sql = "delete from booking where id = ?";
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
+            preparedStatement.setString(1, id);
+            return preparedStatement.execute();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -58,9 +61,10 @@ public class BookingDao implements DatabaseInter<Booking> {
 
     @Override
     public Optional<Booking> getById(String id) {
-        String sql = "select * from booking where id = " + id;
-        try (Statement statement = getConnection().createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sql);
+        String sql = "select * from booking where id = ?";
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
+            preparedStatement.setString(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
             return Optional.of(getBookingValues(resultSet));
         } catch (SQLException throwables) {
@@ -71,11 +75,11 @@ public class BookingDao implements DatabaseInter<Booking> {
 
     @Override
     public boolean update(Booking booking) {
-        String sql = "update booking" +
-                "set ticket_count = " + booking.getTicketCount() +
-                "where id = " + booking.getId();
-        try (Statement statement = getConnection().createStatement()) {
-            return statement.execute(sql);
+        String sql = "update booking set ticket_count = ? where id = ?";
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
+            preparedStatement.setInt(1, booking.getTicketCount());
+            preparedStatement.setInt(2, booking.getId());
+            return preparedStatement.execute();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -97,10 +101,11 @@ public class BookingDao implements DatabaseInter<Booking> {
 //    }
 
     public List<Booking> getBookingsByUserId(String id) {
-        String sql = "select b.* from booking b left join \"user\" u on u.id = b.user_id where u.id = " + id;
+        String sql = "select b.* from booking b left join users u on u.id = b.user_id where u.id = ?";
         List<Booking> bookingsId = new ArrayList<>();
-        try (Statement statement = getConnection().createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sql);
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
+            preparedStatement.setString(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 bookingsId.add(getBookingValues(resultSet));
             }

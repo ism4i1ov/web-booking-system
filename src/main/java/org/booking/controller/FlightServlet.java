@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -29,13 +30,11 @@ public class FlightServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Cookie[] cookies = req.getCookies();
         if (cookies == null) return;
-        String id = "";
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("uid")) {
-                id = cookie.getValue();
-                break;
-            }
-        }
+        String id = Arrays.stream(cookies)
+                .filter(cookie -> cookie.getName().equals("uid"))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse("");
         HashMap<String, Object> data = new HashMap<>();
         bookingService.getUserById(id)
                 .ifPresent(user -> {
@@ -52,9 +51,22 @@ public class FlightServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String[] bookingId = req.getParameterValues("remove_booking");
-        String id = bookingId[0];
-        bookingService.cancelBooking(id);
-        resp.sendRedirect("/user_panel");
+        if (req.getParameter("remove_booking") != null) {
+            String[] bookingId = req.getParameterValues("remove_booking");
+            String id = bookingId[0];
+            bookingService.cancelBooking(id);
+            resp.sendRedirect("/user_panel");
+        } else if (req.getParameter("main_page") != null) {
+            resp.sendRedirect("user_panel");
+        } else if (req.getParameter("logout") != null) {
+            Cookie[] cookies = req.getCookies();
+            Arrays.stream(cookies)
+                    .forEach(cookie -> {
+                        cookie.setMaxAge(0);
+                        resp.addCookie(cookie);
+                    });
+            resp.sendRedirect("/login");
+        }
+
     }
 }
