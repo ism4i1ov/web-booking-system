@@ -17,7 +17,7 @@ public class BookingDao implements DatabaseInter<Booking> {
     public int create(Booking booking) {
         String sql = "insert into " +
                 "booking values(default,?,?,?) returning id";
-        try (PreparedStatement preparedStatement = connection().prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
             preparedStatement.setInt(1, booking.getFlightId());
             preparedStatement.setInt(2, booking.getTicketCount());
             preparedStatement.setInt(3, booking.getUserId());
@@ -33,7 +33,7 @@ public class BookingDao implements DatabaseInter<Booking> {
     @Override
     public boolean delete(String id) {
         String sql = "delete from booking where id = " + id;
-        try (Statement statement = connection().createStatement()) {
+        try (Statement statement = getConnection().createStatement()) {
             return statement.execute(sql);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -45,7 +45,7 @@ public class BookingDao implements DatabaseInter<Booking> {
     public List<Booking> getAll() {
         String sql = "select * from booking";
         List<Booking> bookingList = new ArrayList<>();
-        try (Statement statement = connection().createStatement()) {
+        try (Statement statement = getConnection().createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 bookingList.add(getBookingValues(resultSet));
@@ -59,7 +59,7 @@ public class BookingDao implements DatabaseInter<Booking> {
     @Override
     public Optional<Booking> getById(String id) {
         String sql = "select * from booking where id = " + id;
-        try (Statement statement = connection().createStatement()) {
+        try (Statement statement = getConnection().createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
             resultSet.next();
             return Optional.of(getBookingValues(resultSet));
@@ -74,7 +74,7 @@ public class BookingDao implements DatabaseInter<Booking> {
         String sql = "update booking" +
                 "set ticket_count = " + booking.getTicketCount() +
                 "where id = " + booking.getId();
-        try (Statement statement = connection().createStatement()) {
+        try (Statement statement = getConnection().createStatement()) {
             return statement.execute(sql);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -99,7 +99,7 @@ public class BookingDao implements DatabaseInter<Booking> {
     public List<Booking> getBookingsByUserId(String id) {
         String sql = "select b.* from booking b left join \"user\" u on u.id = b.user_id where u.id = " + id;
         List<Booking> bookingsId = new ArrayList<>();
-        try (Statement statement = connection().createStatement()) {
+        try (Statement statement = getConnection().createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 bookingsId.add(getBookingValues(resultSet));

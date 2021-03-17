@@ -27,16 +27,17 @@ public class UserPanelServlet extends HttpServlet {
         HashMap<String, Object> data = new HashMap<>();
         data.put("flights", flightList);
         Cookie[] cookies = req.getCookies();
-        if(cookies == null) return;
-        String id = "";
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("uid")) {
-                id = cookie.getValue();
-                break;
-            }
-        }
-        Optional<User> user = bookingService.getUserById(id);
-        data.put("user", user.get());
+        if (cookies == null) return;
+
+        String id = Arrays.stream(cookies)
+                .filter(cookie -> cookie.getName().equals("uid"))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse("");
+
+        bookingService.getUserById(id).ifPresent(user -> {
+            data.put("user", user);
+        });
         try {
             templateEngine.render("user_panel.ftl", data, resp);
         } catch (TemplateException e) {
@@ -50,10 +51,11 @@ public class UserPanelServlet extends HttpServlet {
             resp.sendRedirect("/user_flights");
         } else if (req.getParameter("logout") != null) {
             Cookie[] cookies = req.getCookies();
-            for (Cookie cookie : cookies) {
-                cookie.setMaxAge(0);
-                resp.addCookie(cookie);
-            }
+            Arrays.stream(cookies)
+                    .forEach(cookie -> {
+                        cookie.setMaxAge(0);
+                        resp.addCookie(cookie);
+                    });
             resp.sendRedirect("/login");
         } else {
             resp.sendRedirect("/book_flight");

@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface DatabaseInter<T> {
 
-    default Connection connection() throws SQLException {
+    default Connection getConnection() throws SQLException {
         String url = System.getenv("DB_URL");
         String username = System.getenv("DB_USERNAME");
         String password = System.getenv("DB_PASSWORD");

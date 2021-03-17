@@ -12,9 +12,9 @@ import java.util.Optional;
 
 public class BookingService {
 
-    private FlightDao flightDao;
-    private UserDao userDao;
-    private BookingDao bookingDao;
+    private final FlightDao flightDao;
+    private final UserDao userDao;
+    private final BookingDao bookingDao;
 
     public BookingService(FlightDao flightDao, UserDao userDao, BookingDao bookingDao) {
         this.flightDao = flightDao;

@@ -14,7 +14,7 @@ public class FlightDao implements DatabaseInter<Flight> {
     @Override
     public int create(Flight flight) {
         String sql = "insert into flight values(default, ?, ?, ?, ?, ?, ?) returning id";
-        try (PreparedStatement preparedStatement = connection().prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
             preparedStatement.setString(1, flight.getAirlineName());
             preparedStatement.setString(2, flight.getFlightFrom());
             preparedStatement.setString(3, flight.getDestination());
@@ -33,7 +33,7 @@ public class FlightDao implements DatabaseInter<Flight> {
     @Override
     public boolean delete(String id) {
         String sql = "delete from flight where id = " + id;
-        try (Statement statement = connection().createStatement()) {
+        try (Statement statement = getConnection().createStatement()) {
             return statement.execute(sql);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -45,7 +45,7 @@ public class FlightDao implements DatabaseInter<Flight> {
     public List<Flight> getAll() {
         String sql = "select * from flight order by id";
         List<Flight> flightList = new ArrayList<>();
-        try (Statement statement = connection().createStatement()) {
+        try (Statement statement = getConnection().createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 flightList.add(getFlightValues(resultSet));
@@ -59,7 +59,7 @@ public class FlightDao implements DatabaseInter<Flight> {
     @Override
     public Optional<Flight> getById(String id) {
         String sql = "select * from flight where id = " + id;
-        try (Statement statement = connection().createStatement()) {
+        try (Statement statement = getConnection().createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
             resultSet.next();
             return Optional.of(getFlightValues(resultSet));
@@ -72,7 +72,7 @@ public class FlightDao implements DatabaseInter<Flight> {
     public List<Flight> getFlightByDestDateTicketCount(String destination, String date, String ticketCount) {
         String sql = "select * from flight where destination = '" + destination + "' and free_places_in_plain >= " + ticketCount;
         List<Flight> flightList = new ArrayList<>();
-        try (Statement statement = connection().createStatement()) {
+        try (Statement statement = getConnection().createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 flightList.add(getFlightValues(resultSet));
@@ -88,7 +88,7 @@ public class FlightDao implements DatabaseInter<Flight> {
         String sql = "update flight " +
                 "set airline_name = ?, flight_from = ?, destination = ?, free_places_in_plain = ?, depart_date_time = ?, arrive_date_time = ?" +
                 "where id = " + flight.getId();
-        try (PreparedStatement preparedStatement = connection().prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
             preparedStatement.setString(1, flight.getAirlineName());
             preparedStatement.setString(2, flight.getFlightFrom());
             preparedStatement.setString(3, flight.getDestination());

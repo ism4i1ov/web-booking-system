@@ -7,7 +7,7 @@ import java.util.Objects;
 public class User implements Serializable {
 
     private final int id;
-    private String username;
+    private final String username;
     private String password;
     private String name;
     private String surname;

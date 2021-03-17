@@ -12,10 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class BookingFlightServlet extends HttpServlet {
 
@@ -35,19 +32,20 @@ public class BookingFlightServlet extends HttpServlet {
             List<Flight> flights = bookingService.getFlightByDestDateTicketCount(destination, null, ticketCount);
             Cookie[] cookies = req.getCookies();
             if (cookies == null) return;
-            String id = "";
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("uid")) {
-                    id = cookie.getValue();
-                    break;
-                }
-            }
-            Optional<User> userById = bookingService.getUserById(id);
+
+            String id = Arrays.stream(cookies)
+                    .filter(cookie -> cookie.getName().equals("uid"))
+                    .findFirst()
+                    .map(Cookie::getValue)
+                    .orElse("");
+
             HashMap<String, Object> data = new HashMap<>();
-            data.put("user", userById.get());
-            data.put("flights", flights);
+            bookingService.getUserById(id).ifPresent(user -> {
+                data.put("user", user);
+                data.put("flights", flights);
+            });
             try {
-                templateEngine.render("bookflight.ftl", data, resp);
+                templateEngine.render("book-flight.ftl", data, resp);
             } catch (TemplateException e) {
                 e.printStackTrace();
             }
@@ -58,19 +56,20 @@ public class BookingFlightServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Cookie[] cookies = req.getCookies();
         if (cookies == null) return;
-        String id = "";
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("uid")) {
-                id = cookie.getValue();
-                break;
-            }
-        }
-        Optional<User> userById = bookingService.getUserById(id);
+        String id = Arrays.stream(cookies)
+                .filter(cookie -> cookie.getName().equals("uid"))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse("");
+
         HashMap<String, Object> data = new HashMap<>();
-        data.put("user", userById.get());
-        data.put("flights", new ArrayList<Flight>());
+        bookingService.getUserById(id).ifPresent(user -> {
+            data.put("user", user);
+            data.put("flights", new ArrayList<Flight>());
+        });
+
         try {
-            templateEngine.render("bookflight.ftl", data, resp);
+            templateEngine.render("book-flight.ftl", data, resp);
         } catch (TemplateException e) {
             e.printStackTrace();
         }

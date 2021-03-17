@@ -36,12 +36,13 @@ public class FlightServlet extends HttpServlet {
                 break;
             }
         }
-        Optional<User> userById = bookingService.getUserById(id);
-        List<Booking> bookingsIdByUserId = bookingService.getBookingsIdByUserId(String.valueOf(userById.get().getId()));
         HashMap<String, Object> data = new HashMap<>();
-        data.put("bookings", bookingsIdByUserId);
-        data.put("user", userById.get());
-
+        bookingService.getUserById(id)
+                .ifPresent(user -> {
+                    List<Booking> bookingsIdByUserId = bookingService.getBookingsIdByUserId(String.valueOf(user.getId()));
+                    data.put("bookings", bookingsIdByUserId);
+                    data.put("user", user);
+                });
         try {
             templateEngine.render("flights.ftl", data, resp);
         } catch (TemplateException e) {
